@@ -5,7 +5,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.algaworks.algashop'
+group = 'com.rafaelsousa.algashop'
 version = '0.0.1-SNAPSHOT'
 description = 'Notifications Microservice'
 
@@ -107,6 +107,5 @@ tasks.register('dockerBuild', Exec) {
 	group = 'build'
 	dependsOn('bootJar')
 	workingDir project.rootDir
-	commandLine 'docker', 'buildx', 'build', '--platform', 'linux/arm64/v8,linux/amd64',
-			'--tag', 'algashop/notifications:dev', '.'
+	commandLine 'docker', 'buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'rafaelsousa86/notifications:dev', '.'
 }
