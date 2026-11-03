@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface EmailTemplateQueryService {
-
 	EmailTemplateOutput findById(UUID id);
-
 	Page<EmailTemplateOutput> findAll(Pageable pageable);
 }

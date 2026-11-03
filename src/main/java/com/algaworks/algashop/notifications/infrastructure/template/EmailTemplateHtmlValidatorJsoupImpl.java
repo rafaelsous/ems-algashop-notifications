@@ -30,11 +30,9 @@ public class EmailTemplateHtmlValidatorJsoupImpl implements EmailTemplateHtmlVal
 		Document document = Jsoup.parse(html, parser);
 
 		List<String> violations = new ArrayList<>();
-		parser.getErrors().forEach(error -> {
-		    violations.add(String.format("Malformed HTML at position %s: %s",
-			    error.getPosition(), error.getErrorMessage()
-		    ));
-		});
+		parser.getErrors().forEach(error -> violations.add(String.format("Malformed HTML at position %s: %s",
+			error.getPosition(), error.getErrorMessage()
+		)));
 
 		document.getAllElements().forEach(element -> checkElement(element, violations));
 
