@@ -1,19 +1,41 @@
-server.port: 8084
-
 spring:
+  config:
+    import:
+      - aws-secretsmanager:/secret/algashop/notifications/database?prefix=notifications.secrets.datasource.
+      - aws-parameterstore:/config/algashop/notifications?prefix=notifications.params
+      - aws-secretsmanager:/secret/algashop/notifications/database?prefix=notifications.secrets
+      - aws-parameterstore:/config/algashop/shared?prefix=shared.params
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      region:
+        static: us-east-1
+      endpoint: http://algashop-localstack:4566
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/notifications
-    username: postgres
-    password: postgres
+    url: ${notifications.params.datasource.url}
+    username: ${notifications.secrets.datasource.username}
+    password: ${notifications.secrets.datasource.password}
+
   jpa:
-    show-sql: true
+    show-sql: ${notifications.params.jpa.show-sql}
+
   flyway:
     locations: classpath:db/migration,classpath:db/testdata
+
   mail:
-    host: localhost
-    port: 1025
+    host: ${notifications.params.mail.host}
+    port: ${notifications.params.mail.port}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${shared.params.auth-server-url}
 
 algashop:
   notifications:
     mail:
-      from: no-reply@algashop.local
+      from: ${notifications.params.mail.from}
