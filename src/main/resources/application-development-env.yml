@@ -39,7 +39,7 @@ spring:
     bootstrap-servers: algashop-kafka-1:9092,algashop-kafka-2:9093,algashop-kafka-3:9094
     properties:
       spring.json.type.mapping:
-        Notifications.SendEmailCommand:com.algaworks.algashop.notifications.application.email.command.SendEmailIntegrationCommand
+        Notifications.SendEmailCommand:com.rafaelsousa.algashop.notifications.application.email.command.SendEmailIntegrationCommand
     admin:
       fail-fast: true
       auto-create: true
@@ -60,10 +60,10 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
-        spring.json.trusted.packages: com.algaworks.algashop.*
+        spring.json.trusted.packages: com.rafaelsousa.algashop.*
         spring.json.key.default.type: java.lang.String
         spring.json.value.default.type: java.lang.String
-        spring.json.value.type.method: com.algaworks.algashop.notifications.infrastructure.kafka.KafkaConsumerTypeIdIdentifier.readType
+        spring.json.value.type.method: com.rafaelsousa.algashop.notifications.infrastructure.kafka.KafkaConsumerTypeIdIdentifier.readType
 
 algashop:
   notifications:
