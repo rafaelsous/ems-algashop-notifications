@@ -39,3 +39,13 @@ algashop:
   notifications:
     mail:
       from: ${notifications.params.mail.from}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${shared.params.service-registry-url}/eureka
+    healthcheck:
+      enabled: false
+  instance:
+    instance-id: ${random.uuid}
+    prefer-ip-address: true

@@ -1,0 +1,27 @@
+server.port: 8084
+
+spring:
+  application:
+    name: notifications
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notifications_test
+    username: postgres
+    password: postgres
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 10
+      connection-timeout: 3000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/clean
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/notifications_test
+
+eureka:
+  client:
+    enabled: false
