@@ -27,10 +27,11 @@ public class EmailSenderJavaMailImpl implements EmailSender {
 			helper.setTo(new InternetAddress(toEmail, toName, StandardCharsets.UTF_8.name()));
 			helper.setSubject(subject);
 			helper.setText(htmlBody, true);
-
-			mailSender.send(message);
 		} catch (Exception ex) {
 			throw new MailPreparationException("Fail to build email message", ex);
 		}
+
+		// MailException must escape this adapter so Kafka's DefaultErrorHandler can retry.
+		mailSender.send(message);
 	}
 }

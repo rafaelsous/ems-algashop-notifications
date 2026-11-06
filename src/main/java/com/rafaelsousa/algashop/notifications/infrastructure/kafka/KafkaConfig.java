@@ -5,7 +5,6 @@ import com.rafaelsousa.algashop.notifications.domain.model.template.TemplateNotF
 import jakarta.validation.ConstraintViolationException;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.TopicPartition;
@@ -16,12 +15,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.mail.MailParseException;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.util.backoff.ExponentialBackOff;
 
 import java.time.Duration;
 import java.util.Map;
 
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfig {
@@ -38,23 +37,14 @@ public class KafkaConfig {
 
     @Bean
     public DefaultErrorHandler defaultErrorHandler(DeadLetterPublishingRecoverer recoverer) {
-        long interval = 2000L; // 2s entre as tentativas
-        double multiplier = 2;
-        long maxRetries = 3L; // máximo de 2 tentativas
-        long maxInterval = 8000L;
+        DefaultErrorHandler defaultErrorHandler = getDefaultErrorHandler(recoverer);
 
-        ExponentialBackOff exponentialBackOff = new ExponentialBackOff(interval, multiplier);
-        exponentialBackOff.setMaxInterval(maxInterval);
-        exponentialBackOff.setMaxAttempts(maxRetries);
-
-        DefaultErrorHandler defaultErrorHandler =
-                new DefaultErrorHandler(recoverer, exponentialBackOff);
         defaultErrorHandler.addNotRetryableExceptions(
                 TemplateNotFoundException.class,
                 TemplateRenderException.class,
                 ConstraintViolationException.class,
                 MailParseException.class,
-//                MailPreparationException.class, Impede retentativa quando o Mailpit está fora
+                MailPreparationException.class,
                 IllegalArgumentException.class);
 
         return defaultErrorHandler;
@@ -91,5 +81,18 @@ public class KafkaConfig {
             .replicas(TOPIC_REPLICAS)
             .configs(Map.of(MIN_INSYNC_REPLICAS_CONFIG, "2", "retention.ms", RETENTION_30_DAYS))
             .build();
+    }
+
+    private static DefaultErrorHandler getDefaultErrorHandler(DeadLetterPublishingRecoverer recoverer) {
+        long interval = 2000L; // 2s entre as tentativas
+        double multiplier = 2;
+        long maxRetries = 3L; // três intervalos de retry após a primeira entrega
+        long maxInterval = 8000L;
+
+        ExponentialBackOff exponentialBackOff = new ExponentialBackOff(interval, multiplier);
+        exponentialBackOff.setMaxInterval(maxInterval);
+        exponentialBackOff.setMaxAttempts(maxRetries);
+
+        return new DefaultErrorHandler(recoverer, exponentialBackOff);
     }
 }
